@@ -9,13 +9,13 @@ from pymongo import MongoClient
 
 token = config.env['access_token']
 
-
+#add in the mongo server in the instance call
 client = MongoClient()
 convos = client.conversations
 
 responses = ["What university do you attend?", # Convo state 0
 				"Did you mean:",  # Convo state 1
-				"Are you looking for an appartment, house or both?", # Convo state 2
+				"Are you looking for an apartment, house or both?", # Convo state 2
 				"How many bedrooms?", # Convo state 3
 				"What's your price range?", # Convo state 4
 				"Are you concerned about crime in your neighborhood?"] # Convo state 5
@@ -29,17 +29,23 @@ def main_route():
 			payload = request.getData()
 			for message, sender in message_events(payload):
 				# if a convo with this sender exists, run the appropriate protocol
-				if convos.find_one({"id": sender}) != "":
-					parse_and_respond(convos[sender], message)
+				found = convos.find_one({"id": sender})
+				if  found != "":
+					temp = Conversation();
+					temp.prefs = found["prefs"]
+					temp.curState = found["curState"]
+					temp.id = found["id"]
+					temp.numBeds = found["numBeds"]
+					
+					parse_and_respond(temp, message)
+					convos.update_one({"id": sender}, temp)
 				else:
-					convos[sender] = Conversation(sender)
+					# need to change
+					#convos.insert_one(temp)
 					message = "Initial question  as result of function here"
 
 
 			return "okay"
-			#text = data['entry'][0]['messaging'][0]['message']['text']
-			#sender = data['entry'][0]['messaging'][0]['sender']['id']
-			#payload = {'recipient': {'id': sender}, 'message': {'text': "Hello World"}}
 			
 		except Exception as e:
 			print("Something went wrong")
