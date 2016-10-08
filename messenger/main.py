@@ -32,8 +32,9 @@ def main_route():
 			for message, sender in message_events(payload):
 				# if a convo with this sender exists, run the appropriate protocol
 				found = convos.find_one({"id": sender})
+				temp = Conversation();
 				if  found != "":
-					temp = Conversation();
+					
 					temp.prefs = found["prefs"]
 					temp.curState = found["curState"]
 					temp.id = found["id"]
@@ -42,8 +43,7 @@ def main_route():
 					parse_and_respond(temp, message)
 					convos.update_one({"id": sender}, temp)
 				else:
-					# need to change
-					#convos.insert_one(temp)
+					convos.insert_one(temp)
 					message = "Initial question  as result of function here"
 
 
