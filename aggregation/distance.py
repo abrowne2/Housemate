@@ -9,4 +9,4 @@ def haversine(lon1, lat1, lon2, lat2):
     dlon = lon2 - lon1
     dlat = lat2 - lat1
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    return ((2 * asin(sqrt(a))) * 3956) * 1.3 #3956 is the earth's radius in miles.
+    return ((2 * asin(sqrt(a))) * 3956) #3956 is the earth's radius in miles.

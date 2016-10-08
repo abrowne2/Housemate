@@ -43,6 +43,8 @@ def rentCom(college):
     univ = int(input()) - 1
 
     choice = requests.get('http://rent.com' + universities[univ][1])
+    # for apartments, /apartments_condos_townhouses/
+    # for houses, /condos_houses_townhouses/
 
     #retrieve the list of listing_ids, which we can use to obtain a JSON object of all the properties.
     listIds = ','.join(BeautifulSoup(choice.text, "html.parser").find(attrs={"name":"listing_ids"})['content'].split(';'))
@@ -66,6 +68,7 @@ def rentPropertyTraversal(properties, univLoc):
         x['crime'] = crime.fetch(geocode[0]['content'], geocode[1]['content'])
         x['dist_campus'] = distance.haversine(float(univLoc[1]), float(univLoc[0]), float(geocode[0]['content']),
                                      float(geocode[1]['content']))
+        print(x['name'] + ' crime: ' + str(x['crime']) + ' distance: ' + str(x['dist_campus']))
 
 print("Please enter your University name.\n")
-rentCom(input())
+fetchUniversities(input())
