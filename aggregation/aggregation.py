@@ -1,6 +1,5 @@
 '''
-Off Campus Housing Aggregator
-Author: Adam Browne
+Off campus housing aggregator
 '''
 
 import requests, json, crime, distance
@@ -23,7 +22,7 @@ Pertinent information is stored accordingly.
 '''
 
 
-def fetchUniversities(input):
+def autoComplete(input):
     # rent.com uses "ONESEARCH", and you can make calls to their query endpoint for JSON responses, nifty:
     univJSON = requests.get('http://onesearch.svc.primedia.com/autocomplete?q=' + input + '&application=rent')
     univJSON = json.loads(univJSON.text)  # parse the JSON response.
@@ -31,14 +30,10 @@ def fetchUniversities(input):
     # use the seopath to retrieve the listing ids.
     universities = [[x['name'], x['seopath'], x['geocode']] for x in univJSON]
 
-    print("Please select your university: \n")
-    for index, univ in enumerate(universities):
-        print(str(index + 1) + ' ' + str(univ[0]))
-
     return universities
 
 def rentCom(college):
-    universities = fetchUniversities(college)
+    universities = autoComplete(college)
 
     univ = int(input()) - 1 #mark the user's college here.
     print("What are you looking for? House, Apartment, or both?\n")
@@ -48,14 +43,16 @@ def rentCom(college):
 
     if seek == 'House':
         choice = requests.get('http://rent.com' + universities[univ][1] + 'condos_houses_townhouses/')
+        listIds = ','.join(BeautifulSoup(choice.text, "html.parser").find(attrs={"name": "listing_ids"})['content'].split(';'))
     elif seek == 'Apartment':
         choice = requests.get('http://rent.com' + universities[univ][1] + 'apartments_condos_townhouses/')
+        listIds = ','.join(BeautifulSoup(choice.text, "html.parser").find(attrs={"name": "listing_ids"})['content'].split(';'))
     elif seek == 'Both':
         choice = requests.get('http://rent.com' + universities[univ][1])
 
 
     #retrieve the list of listing_ids, which we can use to obtain a JSON object of all the properties.
-    listIds = ','.join(BeautifulSoup(choice.text, "html.parser").find(attrs={"name":"listing_ids"})['content'].split(';'))
+
 
     #below, you don't even have to be authenticated to provide the list of listing_ids...
     propJSON = requests.get('http://rent.com/account/myrent/listings.json?ids=' + listIds)
@@ -76,7 +73,6 @@ def rentPropertyTraversal(properties, univLoc):
         x['crime'] = crime.fetch(geocode[0]['content'], geocode[1]['content'])
         x['dist_campus'] = distance.haversine(float(univLoc[1]), float(univLoc[0]), float(geocode[0]['content']),
                                      float(geocode[1]['content']))
-
         print(x['name'] + ' crime: ' + str(x['crime']) + ' distance: ' + str(x['dist_campus']))
 
 print("Please enter your University name.\n")
