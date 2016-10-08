@@ -1,4 +1,6 @@
-from aggregation import aggregation, crime, distance
+import requests, json, sys
+sys.path.insert(0, 'aggregation/')
+import aggregation
 
 #makeshift enum for states
 class Global_States:
@@ -6,6 +8,7 @@ class Global_States:
     BUDGET = 1
     CRIMERATING = 2
 
+# class University:
 
 
 #model class for modeling the conversation
@@ -14,18 +17,35 @@ class Conversation:
     curState = 0
     id = 0
     numBeds=0
-    
+
     #constructor
     def __init__(self, arg):
         global Global_States
         self.id = arg
-    
+
     def incrState(self):
         self.curState+= 1
-        
-    #setter for pref hash    
+
+    #setter for pref hash
     def setPref(self, prefName, newVal):
         self.prefs[prefName] = newVal
 
+<<<<<<< HEAD
     def getLocation(self, input):
 
+=======
+    #begin parsing functions
+    def ACParser(self, arg):
+        #get the university output
+        universities = aggregation.autoComplete(arg)
+        output = ''
+        #university names are located at the first index:
+        for index, univ in enumerate(universities):
+            output += str(index + 1) + '. ' + univ[0] + '\n'
+        print(output)
+        return output
+
+x = Conversation(243)
+x.ACParser("University of Michigan")
+#testModel = Model(1)
+>>>>>>> d15b164b8417447746a64442d1843b5bc853fd52
