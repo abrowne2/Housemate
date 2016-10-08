@@ -30,10 +30,7 @@ class Conversation:
     def setPref(self, prefName, newVal):
         self.prefs[prefName] = newVal
 
-<<<<<<< HEAD
-    def getLocation(self, input):
 
-=======
     #begin parsing functions
     def ACParser(self, arg):
         #get the university output
@@ -48,4 +45,3 @@ class Conversation:
 x = Conversation(243)
 x.ACParser("University of Michigan")
 #testModel = Model(1)
->>>>>>> d15b164b8417447746a64442d1843b5bc853fd52
