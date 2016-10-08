@@ -40,11 +40,19 @@ def fetchUniversities(input):
 def rentCom(college):
     universities = fetchUniversities(college)
 
-    univ = int(input()) - 1
+    univ = int(input()) - 1 #mark the user's college here.
+    print("What are you looking for? House, Apartment, or both?\n")
+    seek = input()
 
-    choice = requests.get('http://rent.com' + universities[univ][1])
-    # for apartments, /apartments_condos_townhouses/
-    # for houses, /condos_houses_townhouses/
+    #we have to effectively change the print calls into requests made to the FB platform
+
+    if seek == 'House':
+        choice = requests.get('http://rent.com' + universities[univ][1] + 'condos_houses_townhouses/')
+    elif seek == 'Apartment':
+        choice = requests.get('http://rent.com' + universities[univ][1] + 'apartments_condos_townhouses/')
+    elif seek == 'Both':
+        choice = requests.get('http://rent.com' + universities[univ][1])
+
 
     #retrieve the list of listing_ids, which we can use to obtain a JSON object of all the properties.
     listIds = ','.join(BeautifulSoup(choice.text, "html.parser").find(attrs={"name":"listing_ids"})['content'].split(';'))
@@ -68,7 +76,8 @@ def rentPropertyTraversal(properties, univLoc):
         x['crime'] = crime.fetch(geocode[0]['content'], geocode[1]['content'])
         x['dist_campus'] = distance.haversine(float(univLoc[1]), float(univLoc[0]), float(geocode[0]['content']),
                                      float(geocode[1]['content']))
+
         print(x['name'] + ' crime: ' + str(x['crime']) + ' distance: ' + str(x['dist_campus']))
 
 print("Please enter your University name.\n")
-fetchUniversities(input())
+rentCom(input())
