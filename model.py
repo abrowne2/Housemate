@@ -22,7 +22,7 @@ class Conversation:
     id = 0
     numBeds = 0
     house = False
-    apartmentt = False
+    apartment = False
     acResults = []
     acIndex = 0
 
@@ -45,7 +45,6 @@ class Conversation:
         # university names are located at the first index:
         for univ in universities:
             self.acResults.append(univ)
-            # TODO: pipe the data from the universities furhter...
 
     def pricePrs(self, arg):
         # 4 cases: From $$$, $$$ - $$$, $$$, & No price listed
@@ -54,7 +53,7 @@ class Conversation:
     def optionPrs(self, arg):
         # Apartment, House, or Both
         # (Will lead to specific cases)
-        arg.lower()
+        arg = arg.lower()
         if arg == "house":
             house = True
         elif arg == "apartment":
@@ -75,6 +74,9 @@ class Conversation:
         for index, univ in enumerate(self.acResults):
             output += str(index + 1) + '. ' + univ[0] + '\n'
         return output
+
+    def preferentialSearch(self):
+        pass
 
 
 
