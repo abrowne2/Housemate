@@ -8,10 +8,11 @@ class Global_States:
 
 
 #model class for modeling the conversation
-class Model:
-    prefs = {Global_States.LOCATION:"", Global_States.BUDGET:"",Global_States.CRIMERATING:"" }
+class Conversation:
+    prefs = {Global_States.LOCATION:"", Global_States.BUDGET:"",Global_States.CRIMERATING:""}
     curState = 0
     id = 0
+    numBeds=0
     
     #constructor
     def __init__(self, arg):
