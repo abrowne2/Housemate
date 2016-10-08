@@ -13,12 +13,14 @@ token = config.env['access_token']
 client = MongoClient()
 convos = client.conversations
 
-responses = ["What university do you attend?", # Convo state 0
-				"Did you mean:",  # Convo state 1
-				"Are you looking for an apartment, house or both?", # Convo state 2
-				"How many bedrooms?", # Convo state 3
-				"What's your price range?", # Convo state 4
-				"Are you concerned about crime in your neighborhood?"] # Convo state 5
+responses = ["What university do you attend?\n", # Convo state 0
+				"Did you mean:\n",  # Convo state 1
+				"Are you looking for an appartment, house or both?\n", # Convo state 2
+				"How many bedrooms?\n", # Convo state 3
+				"What's your price range?\n", # Convo state 4
+                                "Are you concerned about crime in your neighborhood?" # Convo state 5
+                                ]
+			
 
 main = Blueprint('main', __name__)
 
@@ -87,25 +89,25 @@ def parse_and_respond(convo, message):
 		send_message(convo.id, responses[0])
 
 	elif convo_state == 1:
-		parse_for_autocomplete(message, convo)
-		send_message(convo.id, responses[1] + enumerate(convo.acresults))
+		convo.ACParser(message)
+		send_message(convo.id, responses[1] + convo.acResultsToString)
 
 	elif convo_state == 2:
-		parse_for_type(message, convo)
+		convo.acIndexParse(message)
 		send_message(convo.id, responses[2])
 
 	elif convo_state == 3:
-		parse_for_bedrooms(message, convo)
+		convo.bedBathPrs(message)
 		send_message(convo.id, responses[3])
 
 	elif convo_state == 4:
-		parse_for_price(message, convo)
-		send_message(convo.id, responses[5])
+		convo.pricePrs(message)
+		#return final results here
 
-	elif convo_state == 5:
-		parse_for_crime(message, convo)
-		# return final results here
+	else:
+		convo.curState = 0
 
 	convo.incrState()
+	return
 
 
