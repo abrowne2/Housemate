@@ -20,7 +20,11 @@ class Conversation:
     prefs = {Global_States.LOCATION:"", Global_States.BUDGET:"",Global_States.CRIMERATING:""}
     curState = 0
     id = 0
-    numBeds=0
+    numBeds = 0
+    house = False
+    apartmentt = False
+    acResults = []
+    acIndex = 0
 
     #constructor
     def __init__(self, arg):
@@ -39,22 +43,38 @@ class Conversation:
         # get the university output & TODO: use university class
         universities = aggregation.autoComplete(arg)
         # university names are located at the first index:
-        for index, univ in enumerate(universities):
-            self.acresults += str(index + 1) + '. ' + univ[0] + '\n'
+        for univ in universities:
+            self.acResults.append(univ)
             # TODO: pipe the data from the universities furhter...
 
     def pricePrs(self, arg):
         # 4 cases: From $$$, $$$ - $$$, $$$, & No price listed
-        pass
+        setPref(Global_States.BUDGET, int(arg))
 
     def optionPrs(self, arg):
         # Apartment, House, or Both
         # (Will lead to specific cases)
-        pass
+        arg.loweer()
+        if arg == "house":
+            house = True
+        elif arg == "apartment":
+            apartment = True
+        else:
+            house = True
+            apartment = True
 
     def bedBathPrs(self, arg):
         # typically a range #-# Beds / # Bath
-        pass
+        numBeds = int(arg)
+
+    def acIndexParse(self, arg):
+        acIndex = int(arg)
+
+    def acResultsToString(self):
+        output = ""
+        for index, univ in enumerate(acResults):
+            output += str(index + 1) + '. ' + univ[0] + '\n'
+        return output
 
 
 
