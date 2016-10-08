@@ -56,7 +56,7 @@ def rentCom(college):
     choice = requests.get('http://rent.com' + universities[univ][1])
 
     #retrieve the list of listing_ids, which we can use to obtain a JSON object of all the properties.
-    listIds = ','.join(BeautifulSoup(choice.text).find(attrs={"name":"listing_ids"})['content'].split(';'))
+    listIds = ','.join(BeautifulSoup(choice.text, "html.parser").find(attrs={"name":"listing_ids"})['content'].split(';'))
 
     #below, you don't even have to be authenticated to provide the list of listing_ids...
     propJSON = requests.get('http://rent.com/account/myrent/listings.json?ids=' + listIds)
@@ -72,7 +72,7 @@ def rentCom(college):
 #given a url_path, fetch more information about the specified property
 def rentPropertyTraversal(properties, univLoc):
     for x in properties:
-        propInfo = BeautifulSoup(requests.get('http://rent.com' + x['url_path']).text)
+        propInfo = BeautifulSoup(requests.get('http://rent.com' + x['url_path']).text, "html.parser")
         geocode = propInfo.findAll(True, {"property":['place:location:longitude', 'place:location:latitude']})
         x['dist_campus'] = haversine(float(univLoc[1]), float(univLoc[0]), float(geocode[0]['content']), float(geocode[1]['content']))
         x['crime'] = crime.fetch(geocode[0]['content'], geocode[1]['content'])
