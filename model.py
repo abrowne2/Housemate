@@ -1,3 +1,4 @@
+from aggregation import aggregation, crime, distance
 
 #makeshift enum for states
 class Global_States:
@@ -26,4 +27,5 @@ class Conversation:
     def setPref(self, prefName, newVal):
         self.prefs[prefName] = newVal
 
-#testModel = Model(1)
+    def getLocation(self, input):
+
