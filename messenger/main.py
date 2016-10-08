@@ -14,11 +14,15 @@ main = Blueprint('main', __name__)
 def main_route():
 	if request.method == 'POST':
 		try:
-			data = json.loads(request.data)
-			text = data['entry'][0]['messaging'][0]['message']['text']
-			sender = data['entry'][0]['messaging'][0]['sender']['id']
-			payload = {'recipient': {'id': sender}, 'message': {'text': "Hello World"}}
-			r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, json=payload)
+			payload = request.getData()
+			for message, sender in message_events(payload):
+				print("Incoming post from %s, %s" %(sender,message))
+				send_message(sender, message)
+			return "okay"
+			#text = data['entry'][0]['messaging'][0]['message']['text']
+			#sender = data['entry'][0]['messaging'][0]['sender']['id']
+			#payload = {'recipient': {'id': sender}, 'message': {'text': "Hello World"}}
+			
 		except Exception as e:
 			print("Something went wrong")
 
@@ -28,3 +32,26 @@ def main_route():
 		return "Wrong Verify Token"
 
 	return "Hello World"
+
+#function to generate a list of [id, messageText] from payload
+def messaging_events(payload):
+	data = json.loads(request.data)
+	messaging_events = data["entry"][0]["messaging"]
+	
+	for event in messaging_events:
+		if "message" in event and "text" in event["message"]:
+			yield event ["sender"]["id"], "test"
+			
+			
+#send the message 'text' to 'recipient'			
+def send_message (recipient, text):
+	
+	global token
+	r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, data=json.dumps({
+	"reciepient": {"id": recipient},
+	"message":{"text":
+	           text.decode('unicode_escape')}
+	           }),
+			  headers={'Content-type':'application/json'})
+	if r.status_code != requests.codes.ok:
+		print(r.text)
