@@ -49,12 +49,12 @@ class Conversation:
 
     def pricePrs(self, arg):
         # 4 cases: From $$$, $$$ - $$$, $$$, & No price listed
-        setPref(Global_States.BUDGET, int(arg))
+        self.setPref(Global_States.BUDGET, int(arg))
 
     def optionPrs(self, arg):
         # Apartment, House, or Both
         # (Will lead to specific cases)
-        arg.loweer()
+        arg.lower()
         if arg == "house":
             house = True
         elif arg == "apartment":
@@ -72,9 +72,10 @@ class Conversation:
 
     def acResultsToString(self):
         output = ""
-        for index, univ in enumerate(acResults):
+        for index, univ in enumerate(self.acResults):
             output += str(index + 1) + '. ' + univ[0] + '\n'
         return output
+
 
 
 
