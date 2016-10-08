@@ -8,8 +8,12 @@ class Global_States:
     BUDGET = 1
     CRIMERATING = 2
 
-# class University:
-
+class University:
+    def __init__(self, name, seopath, geocode):
+        self.name = name
+        self.seopath = seopath
+        self.geocode = geocode
+    #continue with this further...
 
 #model class for modeling the conversation
 class Conversation:
@@ -30,18 +34,28 @@ class Conversation:
     def setPref(self, prefName, newVal):
         self.prefs[prefName] = newVal
 
-
-    #begin parsing functions
+    # begin parsing functions
     def ACParser(self, arg):
-        #get the university output
+        # get the university output & TODO: use university class
         universities = aggregation.autoComplete(arg)
-        output = ''
-        #university names are located at the first index:
+        # university names are located at the first index:
         for index, univ in enumerate(universities):
-            output += str(index + 1) + '. ' + univ[0] + '\n'
-        print(output)
-        return output
+            self.acresults += str(index + 1) + '. ' + univ[0] + '\n'
+            # TODO: pipe the data from the universities furhter...
 
-x = Conversation(243)
-x.ACParser("University of Michigan")
+    def pricePrs(self, arg):
+        # 4 cases: From $$$, $$$ - $$$, $$$, & No price listed
+        pass
+
+    def optionPrs(self, arg):
+        # Apartment, House, or Both
+        # (Will lead to specific cases)
+        pass
+
+    def bedBathPrs(self, arg):
+        # typically a range #-# Beds / # Bath
+        pass
+
+
+
 #testModel = Model(1)

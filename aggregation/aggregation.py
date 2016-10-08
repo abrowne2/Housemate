@@ -32,6 +32,9 @@ def autoComplete(input):
 
     return universities
 
+def userOption(input):
+    pass
+
 def rentCom(college):
     universities = autoComplete(college)
 
@@ -75,5 +78,3 @@ def rentPropertyTraversal(properties, univLoc):
                                      float(geocode[1]['content']))
         print(x['name'] + ' crime: ' + str(x['crime']) + ' distance: ' + str(x['dist_campus']))
 
-print("Please enter your University name.\n")
-rentCom(input())
