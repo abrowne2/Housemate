@@ -12,10 +12,9 @@ from pymongo import MongoClient
 token = config.env['access_token']
 
 #add in the mongo server in the instance call
-#client = MongoClient()
-#convos = client.conversations
+client = MongoClient('mongodb://localhost:27017/')
+convos = client.conversations
 
-convos = {}
 
 responses = ["Did you mean:\n",  # Convo state 1
 			"Are you looking for an apartment, house or both?\n", # Convo state 2
@@ -33,29 +32,21 @@ def main_route():
 			payload = request.get_json()
 			for message, sender in messaging_events(payload):
 				# if a convo with this sender exists, run the appropriate protocol
-				#found = convos.find_one({"id": sender})
-				#temp = Conversation(sender);
-				#if  found != "":
-					
-					#temp.prefs = found["prefs"]
-					#temp.curState = found["curState"]
-					#temp.id = found["id"]
-					#temp.numBeds = found["numBeds"]
-					
-					#parse_and_respond(temp, message)
+
+				found = convos.find_one({"id": sender}).count()
+				
+				if  found != 0:
+					temp = Conversation(sender);
+					temp.prefs = found["prefs"]
+					temp.curState = found["curState"]
+					temp.id = found["id"]
+					temp.numBeds = found["numBeds"]
+					parse_and_respond(temp, message)
 					#convos.update_one({"id": sender}, temp)
-				#else:
-					#convos.insert_one(temp)
-					#message = "Initial question  as result of function here"
-
-				#Temporarily using a python dict to store data
-				if sender in convos:
-					parse_and_respond(convos[sender], message)
-
 				else:
-					convos[sender] = Conversation(sender)
-					parse_and_respond(convos[sender], message)
-
+					temp = Conversation(sender);
+					convos.insert_one(temp)
+					message = "Initial question  as result of function here"
 
 			return "okay"
 			
