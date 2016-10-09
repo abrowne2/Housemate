@@ -17,10 +17,10 @@ token = config.env['access_token']
 
 convos = {}
 
-responses = ["Did you mean:\n",  # Convo state 0
-			"Are you looking for an appartment, house or both?\n", # Convo state 1
-			"How many bedrooms?\n", # Convo state 2
-			"What's your price range?\n" # Convo state 4
+responses = ["Did you mean:\n",  # Convo state 1
+			"Are you looking for an apartment, house or both?\n", # Convo state 2
+			"How many bedrooms?\n", # Convo state 3
+			"What's your maximum budget?\n" # Convo state 4
 			]
 			
 
@@ -129,52 +129,55 @@ def parse_and_respond(convo, message):
 	if convo_state == 0:
 		try:
 			convo.ACParser(message)
-			send_message(convo.id, responses[0] + convo.acResultsToString())
-			convo.incrState()
 		except Exception as e:
-			send_message(convo.id, "I'm sorry, I didn't quite get that, can you rephrase?")
-			convo.curState = 0
+			send_message(convo.id, "I'm sorry, I didn't get that, please enter the name of your school.")
+			convo.curState = -1
+		send_message(convo.id, responses[0] + convo.acResultsToString())
+		convo.incrState()
 
 	elif convo_state == 1:
 		try:
 			convo.acIndexParse(message)
-			send_message(convo.id, responses[1])
-			convo.incrState()
 		except Exception as e:
-			send_message(convo.id, "I'm sorry, I didn't quite get that, can you rephrase?")
-			convo.curState = 1
+			send_message(convo.id, "Please choose the number that corresponds to your school.")
+			convo.curState = 0
+		send_message(convo.id, responses[1])
+		convo.incrState()
 
 	elif convo_state == 2:
 		try:
 			convo.optionPrs(message)
-			send_message(convo.id, responses[2])
-			convo.incrState()
 		except Exception as e:
-			send_message(convo.id, "I'm sorry, I didn't quite get that, can you rephrase?")
-			convo.curState = 2
+			send_message(convo.id, "Please enter house, apartment or both.")
+			convo.curState = 1
+		send_message(convo.id, responses[2])
+		convo.incrState()
 
 	elif convo_state == 3:
 		try:
 			convo.bedBathPrs(message)
-			send_message(convo.id, responses[3])
-			convo.incrState()
 		except Exception as e:
-			send_message(convo.id, "I'm sorry, I didn't quite get that, can you rephrase?")
-			convo.curState = 3
+			send_message(convo.id, "Please enter the number of bedrooms you are looking for.")
+			convo.curState = 2
+		send_message(convo.id, responses[3])
+		convo.incrState()
 
 	elif convo_state == 4:
 		try:
 			convo.pricePrs(message)
-			results = convo.preferentialSearch()
-			send_results(convo.id, results)
-			convo.curState = 0
-			send_message(convo.id, "Where else would you like to look for housing?")
 		except Exception as e:
-			send_message(convo.id, "I'm sorry, I don't understand, can you rephrase?")
+			send_message(convo.id, "Please enter your maximum budget for housing.")
 			convo.curState = 4
+		results = convo.preferentialSearch()
+		for result in results:
+			print(result)
+		send_results(convo.id, results)
+		convo.curState = 0
+		send_message(convo.id, "Where else would you like to look for housing?")
 
 	else:
 		convo.curState = 0
+
 
 	return
 
