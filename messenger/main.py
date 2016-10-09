@@ -104,19 +104,20 @@ def send_results (recipient, reults):
 		}
 	}
 	for result in results:
-		res["message"]["attachment"]["payload"]["elements"].append({
-			"title": result["name"],
-			"item_url": result["url_path"],
-			"image_url": result["image_url"],
-			"subtitle": result["address"] + ", " + result["city"],
-			"buttons": [
-				{
-					"type": "web_url",
-					"url": result["url_path"],
-					"title": "View Listing"
-				}
-			]
-		})
+		if result["withinRange"] == True:
+			res["message"]["attachment"]["payload"]["elements"].append({
+				"title": result["name"],
+				"item_url": result["url_path"],
+				"image_url": result["image_url"],
+				"subtitle": result["address"] + ", " + result["city"],
+				"buttons": [
+					{
+						"type": "web_url",
+						"url": result["url_path"],
+						"title": "View Listing"
+					}
+				]
+			})
 	r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, data=json.dumps(res),
 		headers={'content-type':'application/json'})
 	if r.status_code != requests.codes.ok:
