@@ -1,5 +1,6 @@
 from flask import *
-import config
+import sys
+sys.path.insert(0, '.')
 import json
 import traceback
 import random
@@ -74,14 +75,14 @@ def messaging_events(payload):
 			
 #send the message 'text' to 'recipient'			
 def send_message (recipient, text):
-	
 	global token
 	r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, data=json.dumps({
 	"recipient": {"id": recipient},
 	"message":{"text":
 	           text.decode('unicode_escape')}
 	           }),
-			  headers={'Content-type':'application/json'})
+			  headers={'content-type':'application/json'})
+	print("Post request sent")
 	if r.status_code != requests.codes.ok:
 		print(r.text)
 

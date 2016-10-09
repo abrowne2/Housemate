@@ -50,6 +50,7 @@ class Conversation:
         # 4 cases: From $$$, $$$ - $$$, $$$, & No price listed
         self.setPref(Global_States.BUDGET, int(arg))
 
+
     def optionPrs(self, arg):
         # Apartment, House, or Both
         # (Will lead to specific cases)
@@ -76,8 +77,11 @@ class Conversation:
         return output
 
     def preferentialSearch(self):
-        pass
-
+        '''
+        1. Get the seopath from the selected university (acIndex - 1)
+        2. Make the search based on budget, option, etc
+        3. Use aggregator module for further depth
+        '''
 
 
 
