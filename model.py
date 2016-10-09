@@ -86,13 +86,13 @@ class Conversation:
         2. Make the search based on budget, option, etc
         3. Use aggregator module for further depth
         '''
+
         univIndex = self.acIndex - 1
         seopath = self.acResults[univIndex][1]
         name = self.acResults[univIndex][0]
         properties = aggregation.rentPropertyTraversal(aggregation.performChoice(
             self.house, self.apartment, seopath, str(self.prefs[Global_States.BUDGET]), str(self.numBeds)),
-            self.acResults[univIndex][2].split(','), 3)
-
+            self.acResults[univIndex][2].split(','), 2.5)
         return properties
 
         #use the below to test

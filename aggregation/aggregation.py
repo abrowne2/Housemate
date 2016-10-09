@@ -63,6 +63,7 @@ def rentPropertyTraversal(listIds, univLoc, usrDist):
         geocode = propInfo.findAll(True, {"property": ['place:location:longitude', 'place:location:latitude']})
         x['dist_campus'] = distance.haversine(float(univLoc[1]), float(univLoc[0]), float(geocode[0]['content']),
                                               float(geocode[1]['content']))
+        #usrdist might be a string for some reason
         x['withinRange'] = True if x['dist_campus'] < usrDist else False
         if x['withinRange']:
             x['crime'] = crime.fetch(geocode[0]['content'], geocode[1]['content'])
