@@ -74,10 +74,42 @@ def messaging_events(payload):
 #send the message 'text' to 'recipient'			
 def send_message (recipient, text):
 	r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, data=json.dumps({
-	"recipient": {"id": recipient},
-	"message":{"text": text}
+		"recipient": {"id": recipient},
+		"message": {"text": text}
 	}),
 	headers={'content-type':'application/json'})
+	if r.status_code != requests.codes.ok:
+		print(r.text)
+
+def send_results (recipient, reults):
+	res = {
+		"recipient": {"id": recipient},
+		"message": {
+			"attachment": {
+				"type": "template",
+				"payload": {
+					"template_type": "generic",
+					"elements": []
+				}
+			}
+		}
+	}
+	for result in results:
+		res["message"]["attachment"]["payload"]["elements"].append({
+			"title": result["name"],
+			"item_url": result["url_path"],
+			"image_url": result["image_url"],
+			"subtitle": result["address"] + ", " + result["city"],
+			"buttons": [
+				{
+					"type": "web_url",
+					"url": result["url_path"],
+					"title": "View Listing"
+				}
+			]
+		})
+	r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, data=json.dumps(res),
+		headers={'content-type':'application/json'})
 	if r.status_code != requests.codes.ok:
 		print(r.text)
 
@@ -123,8 +155,8 @@ def parse_and_respond(convo, message):
 	elif convo_state == 4:
 		try:
 			convo.pricePrs(message)
-			#return final results here
-			send_message(convo.id, "Results go here:)")
+			results = convo.preferentialSearch()
+			send_results(convo.id, results)
 			convo.curState = 0
 			send_message(convo.id, "Where else would you like to look for housing?")
 		except Exception as e:

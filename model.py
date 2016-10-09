@@ -48,6 +48,8 @@ class Conversation:
 
     def pricePrs(self, arg):
         # 4 cases: From $$$, $$$ - $$$, $$$, & No price listed
+        if int(arg) > 5000: #input validation for rent.com
+            arg = 5000
         self.setPref(Global_States.BUDGET, int(arg))
 
 
@@ -56,19 +58,21 @@ class Conversation:
         # (Will lead to specific cases)
         arg = arg.lower()
         if arg == "house":
-            house = True
+            self.house = True
         elif arg == "apartment":
-            apartment = True
+            self.apartment = True
         else:
-            house = True
-            apartment = True
+            self.house = True
+            self.apartment = True
 
     def bedBathPrs(self, arg):
         # typically a range #-# Beds / # Bath
-        numBeds = int(arg)
+        self.numBeds = int(arg)
+        if self.numBeds > 4: #input validation for rent.com
+            self.numBeds = 4
 
     def acIndexParse(self, arg):
-        acIndex = int(arg)
+        self.acIndex = int(arg)
 
     def acResultsToString(self):
         output = ""
@@ -82,7 +86,20 @@ class Conversation:
         2. Make the search based on budget, option, etc
         3. Use aggregator module for further depth
         '''
+        univIndex = self.acIndex - 1
+        seopath = self.acResults[univIndex][1]
+        name = self.acResults[univIndex][0]
+        properties = aggregation.rentPropertyTraversal(aggregation.performChoice(
+            self.house, self.apartment, seopath, str(self.prefs[Global_States.BUDGET]), str(self.numBeds)),
+            self.acResults[univIndex][2].split(','), self.prefs[Global_States.LOCATION])
 
+        return properties
 
+        #use the below to test
+        # print('User wants to be ' + str(self.prefs[Global_States.LOCATION]) + ' mi from campus, budget: ' +
+        #       str(self.prefs[Global_States.BUDGET]) + ', up to ' + str(self.numBeds) + ' beds')
+        # for x in properties:
+        #     if x['withinRange'] is True:
+        #         print(x['name'] + ' ' + str(x['price_range']) + ' ' + x['bedroom_range'] +
+        #               ' , dist: ' + str(x['dist_campus']) + ' mi, Crime: ' + str(x['crime']))
 
-#testModel = Model(1)

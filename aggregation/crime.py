@@ -8,7 +8,7 @@ Exploring an unsupervised learning algorithm with ML would be very useful and go
 
 #fetch crime based on geocode: Lat, Longitude
 def fetch(lon, lat):
-    crimeInfoJSON = json.loads(requests.get('https://api.spotcrime.com/crimes.json?lat=' + lat + '&lon=' + lon + '&radius=0.04&key=.').text)
+    crimeInfoJSON = json.loads(requests.get('https://api.spotcrime.com/crimes.json?lat=' + lat + '&lon=' + lon + '&radius=0.025&key=.').text)
     crimes = dict(Counter([ _['type'] for _ in crimeInfoJSON['crimes']])) #count the occurences of the crimes
     return computeScore(crimes)
 
