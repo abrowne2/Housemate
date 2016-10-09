@@ -2,7 +2,7 @@
 from math import radians, cos, sin, asin, sqrt
 
 #used to calculate distance between two points of long / lat
-#credit: James Inman, Florian Cajori,  & José de Mendoza y Ríos
+#credit: James Inman, Florian Cajori,  & Jose de Mendoza y Rios
 #NOTE: introducing a factor of 1.3 will make the result closer to the actual.
 def haversine(lon1, lat1, lon2, lat2):
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
