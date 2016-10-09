@@ -12,9 +12,11 @@ from pymongo import MongoClient
 token = config.env['access_token']
 
 #add in the mongo server in the instance call
-client = MongoClient('mongodb://localhost:27017/')
-convos = client.conversations
+#client = MongoClient('mongodb://localhost:27017/')
+#convos = client.conversations
 
+#temp convos dict
+convos = {}
 
 responses = ["Did you mean:\n",  # Convo state 1
 			"Are you looking for an apartment, house or both?\n", # Convo state 2
@@ -33,20 +35,28 @@ def main_route():
 			for message, sender in messaging_events(payload):
 				# if a convo with this sender exists, run the appropriate protocol
 
-				found = convos.find_one({"id": sender}).count()
+				#found = convos.find_one({"id": sender}).count()
 				
-				if  found != 0:
-					temp = Conversation(sender);
-					temp.prefs = found["prefs"]
-					temp.curState = found["curState"]
-					temp.id = found["id"]
-					temp.numBeds = found["numBeds"]
-					parse_and_respond(temp, message)
-					#convos.update_one({"id": sender}, temp)
+				#if  found != 0:
+				#	temp = Conversation(sender);
+				#	temp.prefs = found["prefs"]
+				#	temp.curState = found["curState"]
+				#	temp.id = found["id"]
+				#	temp.numBeds = found["numBeds"]
+				#	parse_and_respond(temp, message)
+				#	convos.update_one({"id": sender}, temp)
+				#else:
+				#	temp = Conversation(sender);
+				#	convos.insert_one(temp)
+				#	message = "Initial question  as result of function here"
+
+				if sender in convos:
+					parse_and_respond(convos[sender], message)
+
 				else:
-					temp = Conversation(sender);
-					convos.insert_one(temp)
-					message = "Initial question  as result of function here"
+					convos[sender] = Conversation(sender)
+					parse_and_respond(convos[sender], message)
+
 
 			return "okay"
 			
@@ -81,7 +91,7 @@ def send_message (recipient, text):
 	if r.status_code != requests.codes.ok:
 		print(r.text)
 
-def send_results (recipient, reults):
+def send_results (recipient, results):
 	res = {
 		"recipient": {"id": recipient},
 		"message": {
@@ -98,13 +108,13 @@ def send_results (recipient, reults):
 		if result["withinRange"] == True:
 			res["message"]["attachment"]["payload"]["elements"].append({
 				"title": result["name"],
-				"item_url": result["url_path"],
+				"item_url": "rent.com/" + result["url_path"],
 				"image_url": result["image_url"],
-				"subtitle": result["address"] + ", " + result["city"],
+				"subtitle": result["bedroom_range"] + " in " + result["city"],
 				"buttons": [
 					{
 						"type": "web_url",
-						"url": result["url_path"],
+						"url": "rent.com/" + result["url_path"],
 						"title": "View Listing"
 					}
 				]
@@ -164,6 +174,10 @@ def parse_and_respond(convo, message):
 			print(result)
 		send_results(convo.id, results)
 		convo.curState = 0
+		convo.house = False
+		convo.apartment = False
+		convo.acResults = []
+		convo.acIndex = 0
 		send_message(convo.id, "Where else would you like to look for housing?")
 
 	else:
