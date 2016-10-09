@@ -40,7 +40,7 @@ class Conversation:
 
     # begin parsing functions
     def ACParser(self, arg):
-        # get the university output & TODO: use university class
+        # get the university output
         universities = aggregation.autoComplete(arg)
         # university names are located at the first index:
         for univ in universities:
@@ -91,7 +91,7 @@ class Conversation:
         name = self.acResults[univIndex][0]
         properties = aggregation.rentPropertyTraversal(aggregation.performChoice(
             self.house, self.apartment, seopath, str(self.prefs[Global_States.BUDGET]), str(self.numBeds)),
-            self.acResults[univIndex][2].split(','), self.prefs[Global_States.LOCATION])
+            self.acResults[univIndex][2].split(','), 3)
 
         return properties
 
