@@ -15,7 +15,7 @@ token = config.env['access_token']
 #client = MongoClient('mongodb://localhost:27017/')
 #convos = client.conversations
 
-#temp convos dict
+#temp convos dict until we have a database.
 convos = {}
 
 responses = ["Did you mean:\n",  # Convo state 1
@@ -23,7 +23,7 @@ responses = ["Did you mean:\n",  # Convo state 1
 			"How many bedrooms?\n", # Convo state 3
 			"What's your maximum budget?\n" # Convo state 4
 			]
-			
+
 
 main = Blueprint('main', __name__)
 
@@ -36,7 +36,7 @@ def main_route():
 				# if a convo with this sender exists, run the appropriate protocol
 
 				#found = convos.find_one({"id": sender}).count()
-				
+
 				#if  found != 0:
 				#	temp = Conversation(sender);
 				#	temp.prefs = found["prefs"]
@@ -51,15 +51,14 @@ def main_route():
 				#	message = "Initial question  as result of function here"
 
 				if sender in convos:
-					parse_and_respond(convos[sender], message)
-
+					parse_and_respond(sender, message)
 				else:
 					convos[sender] = Conversation(sender)
-					parse_and_respond(convos[sender], message)
+					parse_and_respond(sender, message)
 
 
 			return "okay"
-			
+
 		except Exception as e:
 			print(type(e))
 			print(e.args)
@@ -75,13 +74,13 @@ def main_route():
 def messaging_events(payload):
 	data = payload
 	messaging_events = data["entry"][0]["messaging"]
-	
+
 	for event in messaging_events:
 		if "message" in event and "text" in event["message"]:
 			yield event["message"]["text"], event["sender"]["id"]
-			
-			
-#send the message 'text' to 'recipient'			
+
+
+#send the message 'text' to 'recipient'
 def send_message (recipient, text):
 	r = requests.post('https://graph.facebook.com/v2.6/me/messages/?access_token=' + token, data=json.dumps({
 		"recipient": {"id": recipient},
@@ -125,65 +124,57 @@ def send_results (recipient, results):
 		print(r.text)
 
 # Determine the relevant function to parse user input and respond with the next relevant question
-def parse_and_respond(convo, message):
-	convo_state = convo.curState
+def parse_and_respond(sender, message):
+	convo_state = convos[sender].curState
 	if convo_state == 0:
 		try:
-			convo.ACParser(message)
+			convos[sender].ACParser(message)
+			send_message(sender, responses[0] + convos[sender].acResultsToString())
+			convos[sender].curState += 1
 		except Exception as e:
-			send_message(convo.id, "I'm sorry, I didn't get that, please enter the name of your school.")
-			convo.curState = -1
-		send_message(convo.id, responses[0] + convo.acResultsToString())
-		convo.incrState()
+			send_message(sender, "I'm sorry, I didn't get that, please enter the name of your school.")
+			convos[sender].curState = 0
 
 	elif convo_state == 1:
 		try:
-			convo.acIndexParse(message)
+			convos[sender].acIndexParse(message)
+			send_message(sender, responses[1])
+			convos[sender].curState += 1
 		except Exception as e:
-			send_message(convo.id, "Please choose the number that corresponds to your school.")
-			convo.curState = 0
-		send_message(convo.id, responses[1])
-		convo.incrState()
+			send_message(sender, "Please choose the number that corresponds to your school.")
+			convos[sender].curState = 1
 
 	elif convo_state == 2:
 		try:
-			convo.optionPrs(message)
+			convos[sender].optionPrs(message)
+			send_message(sender, responses[2])
+			convos[sender].curState += 1
 		except Exception as e:
-			send_message(convo.id, "Please enter house, apartment or both.")
-			convo.curState = 1
-		send_message(convo.id, responses[2])
-		convo.incrState()
+			send_message(sender, "Please enter house, apartment or both.")
+			convos[sender].curState = 2
 
 	elif convo_state == 3:
 		try:
-			convo.bedBathPrs(message)
+			convos[sender].bedBathPrs(message)
+			send_message(sender, responses[3])
+			convos[sender].curState += 1
 		except Exception as e:
-			send_message(convo.id, "Please enter the number of bedrooms you are looking for.")
-			convo.curState = 2
-		send_message(convo.id, responses[3])
-		convo.incrState()
+			send_message(sender, "Please enter the number of bedrooms you are looking for.")
+			convos[sender].curState = 3
 
 	elif convo_state == 4:
 		try:
-			convo.pricePrs(message)
+			convos[sender].pricePrs(message)
 		except Exception as e:
-			send_message(convo.id, "Please enter your maximum budget for housing.")
-			convo.curState = 4
-		results = convo.preferentialSearch()
-		for result in results:
-			print(result)
-		send_results(convo.id, results)
-		convo.curState = 0
-		convo.house = False
-		convo.apartment = False
-		convo.acResults = []
-		convo.acIndex = 0
-		send_message(convo.id, "Where else would you like to look for housing?")
+			send_message(sender, "Please enter your maximum budget for housing.")
+			convos[sender].curState = 4
+		results = convos[sender].preferentialSearch()
+		send_results(sender, results)
+		convos.pop(sender, None) #wipe the old entry there.
+		send_message(sender, "Where else would you like to look for housing?")
 
 	else:
-		convo.curState = 0
+		convos[sender].curState = 0
 
 
 	return
-
-

@@ -2,22 +2,10 @@ import requests, json, sys
 sys.path.insert(0, 'aggregation/')
 import aggregation
 
-#makeshift enum for states
-class Global_States:
-    LOCATION = 0
-    BUDGET = 1
-    CRIMERATING = 2
-
-class University:
-    def __init__(self, name, seopath, geocode):
-        self.name = name
-        self.seopath = seopath
-        self.geocode = geocode
-    #continue with this further...
 
 #model class for modeling the conversation
 class Conversation:
-    prefs = {Global_States.LOCATION:"", Global_States.BUDGET:"",Global_States.CRIMERATING:""}
+    budget = 1000
     curState = 0
     id = 0
     numBeds = 0
@@ -28,15 +16,7 @@ class Conversation:
 
     #constructor
     def __init__(self, arg):
-        global Global_States
         self.id = arg
-
-    def incrState(self):
-        self.curState+= 1
-
-    #setter for pref hash
-    def setPref(self, prefName, newVal):
-        self.prefs[prefName] = newVal
 
     # begin parsing functions
     def ACParser(self, arg):
@@ -50,7 +30,7 @@ class Conversation:
         # 4 cases: From $$$, $$$ - $$$, $$$, & No price listed
         if int(arg) > 5000: #input validation for rent.com
             arg = 5000
-        self.setPref(Global_States.BUDGET, int(arg))
+        self.budget = int(arg)
 
 
     def optionPrs(self, arg):
@@ -91,7 +71,7 @@ class Conversation:
         seopath = self.acResults[univIndex][1]
         name = self.acResults[univIndex][0]
         properties = aggregation.rentPropertyTraversal(aggregation.performChoice(
-            self.house, self.apartment, seopath, str(self.prefs[Global_States.BUDGET]), str(self.numBeds)),
+            self.house, self.apartment, seopath, str(self.budget), str(self.numBeds)),
             self.acResults[univIndex][2].split(','), 2.5)
         return properties
 
@@ -102,4 +82,3 @@ class Conversation:
         #     if x['withinRange'] is True:
         #         print(x['name'] + ' ' + str(x['price_range']) + ' ' + x['bedroom_range'] +
         #               ' , dist: ' + str(x['dist_campus']) + ' mi, Crime: ' + str(x['crime']))
-
