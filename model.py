@@ -5,23 +5,21 @@ import aggregation
 
 #model class for modeling the conversation
 class Conversation:
-    budget = 1000
-    curState = 0
-    id = 0
-    numBeds = 0
-    house = False
-    apartment = False
-    acResults = []
-    acIndex = 0
 
-    #constructor
-    def __init__(self, arg):
-        self.id = arg
+    #constructor-> a bit over the top, but it works
+    #set default curState to be one.
+    def __init__(self, arg, budget=1000, curState=1, numBeds=0, house=False,
+        apartment=False, acResults=[], acIndex=0):
+        self.id = arg; self.budget = budget
+        self.curState = curState; self.numBeds = numBeds
+        self.house = house; self.apartment = apartment
+        self.acResults = acResults; self.acIndex = acIndex
 
     # begin parsing functions
     def ACParser(self, arg):
         # get the university output
         universities = aggregation.autoComplete(arg)
+        print(universities)
         # university names are located at the first index:
         for univ in universities:
             self.acResults.append(univ)
@@ -55,9 +53,9 @@ class Conversation:
         self.acIndex = int(arg)
 
     def acResultsToString(self):
-        output = ""
+        output = ''
         for index, univ in enumerate(self.acResults):
-            output += str(index + 1) + '. ' + univ[0] + '\n'
+            output = output+ str(index + 1) + '. ' + univ[0] + '\n'
         return output
 
     def preferentialSearch(self):
@@ -72,7 +70,7 @@ class Conversation:
         name = self.acResults[univIndex][0]
         properties = aggregation.rentPropertyTraversal(aggregation.performChoice(
             self.house, self.apartment, seopath, str(self.budget), str(self.numBeds)),
-            self.acResults[univIndex][2].split(','), 2.5)
+            self.acResults[univIndex][2].split(','), 3.5)
         return properties
 
         #use the below to test

@@ -4,7 +4,6 @@ sys.path.insert(0, '.')
 import config
 import json
 import traceback
-import random
 import requests
 from model import Conversation
 from pymongo import MongoClient
