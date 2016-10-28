@@ -19,7 +19,6 @@ class Conversation:
     def ACParser(self, arg):
         # get the university output
         universities = aggregation.autoComplete(arg)
-        print(universities)
         # university names are located at the first index:
         for univ in universities:
             self.acResults.append(univ)
